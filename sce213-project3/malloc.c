@@ -43,8 +43,8 @@ static void *bp;             // Don't modify thie line
 void *my_malloc(size_t size)
 {
   /* Implement this function */
-  void* ptr = sbrk(HDRSIZE + ((size/ALIGNMENT)*ALIGNMENT));
-  // header_t new =
+  void* ptr = sbrk( ( ((size+HDRSIZE)/ALIGNMENT) * ALIGNMENT ) );
+  header_t new;
 
   if(g_algo == FIRST_FIT)
   {
