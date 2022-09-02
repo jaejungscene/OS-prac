@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 #include <time.h>
 #define NUM_THREADS 3
 #define SIZE 2
-#define TIME 30
+#define TIME 60
 
 void *thread01(){
   printf("i'm thread01 : %p\n", pthread_self());
@@ -60,21 +60,11 @@ void *thread01(){
 
 /**
  * thread02 하나만 duplicate하여 fork()를 수행한다.
- * 전체 process를 fork()하지 않는다.
+ * 전체 process의 thread를 fork()하지 않는다.
  */
 void *thread02(){
   printf("i'm thread02 : %p\n", pthread_self());
-  if(fork() == 0){
-    printf("child PID = %d\n", getpid());
-    printf("child thread ID = %p\n", pthread_self());
-    sleep(TIME);
-  }
-  else{
-    printf("parent PID = %d\n", getpid());
-    printf("parent thread ID = %p\n", pthread_self());
-    sleep(TIME);
-    printf("thread02 finish!\n");
-  }
+  sleep(TIME);
   pthread_exit(NULL);
 }
 
@@ -86,6 +76,16 @@ int main (int argc, char *argv[]){
   /* multithread */
   pthread_create(&threads[0], NULL, thread01, NULL);
   pthread_create(&threads[1], NULL, thread02, NULL);
+
+  if(fork() == 0){
+    printf("child PID = %d\n", getpid());
+    sleep(TIME);
+  }
+  else{
+    printf("parent PID = %d\n", getpid());
+    sleep(TIME);
+  }
+
   pthread_join(threads[0], NULL);
   pthread_join(threads[1], NULL);
 

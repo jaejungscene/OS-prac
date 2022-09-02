@@ -1,7 +1,8 @@
 #include <stdio.h>
-#include <sys/wait.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 int data = 13;
 int main(){
@@ -10,36 +11,42 @@ int main(){
   // printf("%d %d\n", pid, x);
   printf("hello %d\n", data);
 
+  /**
+   * parent process가 먼저 끝남에도 불구하고
+   * child process가 끝날 때까지 5초를 기다린 후
+   * parent process 마지막으로 process를 끝낸다.
+   */
 
-    /**
-     * sleep을 1초라도 해야지 child와 parent
-     * process의 printf가 모두 보일 수 있다.
-     * 만약 sleep을 하지 않는다면 
-     * 자식 프로세스가 printf에 도달하기도 전에
-     * 부모 프로세스가 terminate되면서 
-     * 자식 process도 같이 terminate될 수 있기 때문이다.
-     **/
-
-    /**
-     * wait() system call을 쓰지 않았기 때문에
-     * 이 program에서 나온 parent process는 child process가
-     * exit하는지에 대해선 상관하지 않고 그냥 자신의 process를 진행한다.
-     **/
-
+  pid_t cpid = 0;
+  int exit_status = 0;
   if((pid = fork()) == 0){
     /* child */
+    printf("====== child ======\n");
     printf("Child of %d is %d\n",
             getppid(), getpid());
-    sleep(30);
+    sleep(3);
+    printf("== child finish ==\n");
+    // exit(1);
+    return 0;
   }
   else{
     /* parent */
-    wait(NULL);
-    sleep(2);
+    // sleep(1);
+    printf("====== parent ======\n");
+    exit(1);
+    cpid = wait(&exit_status);  /* import part!!!! */
+    if(WIFEXITED(exit_status))  // 자식 process가 오류없이 정상종료
+      printf("safe exit in child process : %d\n", exit_status);
+    else
+      printf("some error occur in child process : %d\n", exit_status);
     printf("I am %d. My child is %d\n",
             getpid(), pid);
+
+    printf("terminated child PID : %d\n", cpid);
+    printf("last PID : %d\n", getpid());
+    printf("== parent finish ==\n");
+    return 0;        
   }
-  return 0;
 }
 
 

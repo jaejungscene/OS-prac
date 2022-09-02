@@ -21,12 +21,12 @@ int main(){
   int exit_status = 0;
   if((pid = fork()) == 0){
     /* child */
-    // sleep(10);
     printf("====== child ======\n");
     printf("Child of %d is %d\n",
             getppid(), getpid());
+    sleep(30);
     printf("== child finish ==\n");
-    exit(1);
+    // exit(1);
     return 0;
   }
   else{
